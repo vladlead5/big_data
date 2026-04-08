@@ -1,0 +1,113 @@
+// схема снежинка — bdsnowflake
+
+Table dw.dim_date {
+  date_key integer [pk]
+  full_date date [unique, not null]
+  day_of_month smallint [not null]
+  month_number smallint [not null]
+  month_name text [not null]
+  quarter_number smallint [not null]
+  year_number integer [not null]
+  week_of_year smallint [not null]
+  day_of_week smallint [not null]
+}
+
+Table dw.dim_geo {
+  geo_key bigint [pk]
+  geo_bk_hash text [unique, not null]
+  country text
+  state text
+  city text
+  postal_code text
+  address text
+  location text
+}
+
+Table dw.dim_pet_type {
+  pet_type_key bigint [pk]
+  pet_type_name text [unique, not null]
+}
+
+Table dw.dim_pet_category {
+  pet_category_key bigint [pk]
+  pet_category_name text [unique, not null]
+}
+
+Table dw.dim_customer {
+  customer_key bigint [pk]
+  customer_bk_hash text [unique, not null]
+  source_id integer
+  geo_key bigint [ref: > dw.dim_geo.geo_key]
+  pet_type_key bigint [ref: > dw.dim_pet_type.pet_type_key]
+  customer_email text
+  first_name text
+  last_name text
+  age integer
+  pet_name text
+  pet_breed text
+}
+
+Table dw.dim_seller {
+  seller_key bigint [pk]
+  seller_bk_hash text [unique, not null]
+  source_id integer
+  geo_key bigint [ref: > dw.dim_geo.geo_key]
+  seller_email text
+  first_name text
+  last_name text
+}
+
+Table dw.dim_product {
+  product_key bigint [pk]
+  product_bk_hash text [unique, not null]
+  source_id integer
+  pet_category_key bigint [ref: > dw.dim_pet_category.pet_category_key]
+  product_name text
+  product_category text
+  product_brand text
+  product_material text
+  product_color text
+  product_size text
+  product_weight numeric
+  product_price numeric
+  product_rating numeric
+  product_reviews integer
+  product_release_date date
+  product_expiry_date date
+  product_description text
+}
+
+Table dw.dim_store {
+  store_key bigint [pk]
+  store_bk_hash text [unique, not null]
+  geo_key bigint [ref: > dw.dim_geo.geo_key]
+  store_name text
+  store_phone text
+  store_email text
+}
+
+Table dw.dim_supplier {
+  supplier_key bigint [pk]
+  supplier_bk_hash text [unique, not null]
+  geo_key bigint [ref: > dw.dim_geo.geo_key]
+  supplier_name text
+  supplier_contact text
+  supplier_email text
+  supplier_phone text
+}
+
+Table dw.fact_sales {
+  sales_key bigint [pk]
+  source_row_id integer
+  date_key integer [not null, ref: > dw.dim_date.date_key]
+  customer_key bigint [not null, ref: > dw.dim_customer.customer_key]
+  seller_key bigint [not null, ref: > dw.dim_seller.seller_key]
+  product_key bigint [not null, ref: > dw.dim_product.product_key]
+  store_key bigint [not null, ref: > dw.dim_store.store_key]
+  supplier_key bigint [not null, ref: > dw.dim_supplier.supplier_key]
+  sale_quantity integer
+  sale_total_price numeric
+  listed_product_price numeric
+  listed_product_quantity integer
+  created_at timestamp
+}

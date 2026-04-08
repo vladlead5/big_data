@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: bdsnowflake-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: bdsnowflake
+      POSTGRES_USER: bds_user
+      POSTGRES_PASSWORD: bds_password
+      TZ: Europe/Moscow
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./исходные данные:/data/csv:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bds_user -d bdsnowflake"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres_data:
